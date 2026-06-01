@@ -1,0 +1,41 @@
+{
+  "name": "codemirror-lang-snobol",
+  "version": "0.1.0",
+  "description": "SNOBOL4 language support for CodeMirror",
+  "keywords": [
+    "codemirror",
+    "snobol",
+    "snobol4",
+    "syntax-highlighting"
+  ],
+  "author": "Ori Livneh <ori.livneh@gmail.com>",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atdt/codemirror-lang-snobol.git"
+  },
+  "homepage": "https://github.com/atdt/codemirror-lang-snobol#readme",
+  "bugs": "https://github.com/atdt/codemirror-lang-snobol/issues",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "peerDependencies": {
+    "@codemirror/language": "^6.0.0",
+    "@lezer/highlight": "^1.0.0"
+  },
+  "devDependencies": {
+    "@codemirror/language": "^6.10.0",
+    "@lezer/highlight": "^1.2.0"
+  }
+}
