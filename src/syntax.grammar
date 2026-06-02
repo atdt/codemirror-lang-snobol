@@ -1,0 +1,80 @@
+// SNOBOL4 grammar for CodeMirror, targeting the Snoflake dialect.
+//
+// SNOBOL4 highlighting does not need a real parse tree: a blank is at once
+// the concatenation operator and the field separator, which no context-free
+// grammar untangles, and coloring does not need the distinction. So the
+// program is a flat stream of tokens. The one genuinely context-sensitive
+// piece, column-one card classification, lives in the external tokenizer
+// (see tokens.js, mirroring Snoflake's CARDTB). The multi-line backtick
+// literal carries inline JavaScript, highlighted by parseMixed in index.js.
+
+@top Program { token* }
+
+@skip { space }
+
+token {
+  LineComment |
+  ControlLine |
+  Continuation |
+  Label |
+  Word | Builtin | ControlKeyword |
+  Keyword |
+  Number |
+  String |
+  BacktickString |
+  Operator |
+  "(" | ")" | "<" | ">" | "[" | "]" | "," | ";" | Colon
+}
+
+// END and the other control words, plus the broad builtin set, are split off
+// from a plain identifier by an external function so the lookup can fold case.
+@external specialize { Word } classifyWord from "./tokens.js" {
+  Builtin,
+  ControlKeyword
+}
+
+// Column-one tokens depend on line position, which a context-free token
+// cannot see, so an external tokenizer emits them.
+@external tokens cardStart from "./tokens.js" {
+  LineComment,
+  ControlLine,
+  Continuation,
+  Label
+}
+
+@tokens {
+  space { $[ \t\r\n]+ }
+
+  // A letter, then letters, digits, and the break characters _ and . (the
+  // dot binds within a name, matching Snoflake's VARTB).
+  Word { $[a-zA-Z] $[a-zA-Z0-9_.]* }
+
+  // An &-keyword reference such as &ANCHOR. A bare & is the binary operator.
+  Keyword { "&" $[a-zA-Z]+ }
+
+  // An integer, or a real with digits on both sides of the point. A leading
+  // dot is therefore the name operator, never the start of a literal.
+  Number { $[0-9]+ ("." $[0-9]+)? }
+
+  // Single- and double-quoted strings stay on one line. The closing quote is
+  // optional so an unterminated literal still colors to the line end, as
+  // Snoflake's scanner runs it to the end of the card.
+  String { "'" !['\n]* "'"? | '"' !["\n]* '"'? }
+
+  // A backtick range may run on to later lines; it holds inline JavaScript.
+  // The closing backtick is likewise optional for robustness.
+  BacktickString { "`" ![`]* "`"? }
+
+  Operator { "**" | $[-+*/|&@#%$~?!^.=] }
+
+  Colon { ":" }
+
+  "(" ")" "<" ">" "[" "]" "," ";"
+
+  // Help the tokenizer prefer longer matches.
+  @precedence { BacktickString, Operator }
+  @precedence { Keyword, Operator }
+  @precedence { Number, Operator }
+}
+
+@detectDelim

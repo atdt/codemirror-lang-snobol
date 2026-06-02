@@ -28,6 +28,9 @@
     "LICENSE"
   ],
   "scripts": {
+    "build:grammar": "lezer-generator src/syntax.grammar -o src/parser.js",
+    "pretest": "npm run build:grammar",
+    "prepublishOnly": "npm run build:grammar",
     "test": "node --test"
   },
   "peerDependencies": {
@@ -36,6 +39,11 @@
   },
   "devDependencies": {
     "@codemirror/language": "^6.10.0",
+    "@lezer/generator": "^1.8.0",
     "@lezer/highlight": "^1.2.0"
+  },
+  "dependencies": {
+    "@lezer/javascript": "^1.5.4",
+    "@lezer/lr": "^1.4.10"
   }
 }
